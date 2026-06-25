@@ -1,3 +1,5 @@
+![Demo](./chat.gif)
+
 # Trello MCP — n8n
 
 A Model Context Protocol (MCP) server for Trello, built on n8n. Gives Claude (or any MCP client) full read/write access to your Trello boards, lists, cards, and comments.
