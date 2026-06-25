@@ -1,0 +1,889 @@
+{
+  "name": "Trello MCP - v3",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "trello-v3"
+      },
+      "id": "8b4326a2-2c85-4256-b88d-4d5af5bd7a5a",
+      "name": "MCP Trello",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        -96
+      ],
+      "webhookId": "8c77e6ed-9382-4c8f-a414-e0d53c1de43a"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all Trello boards the authenticated user has access to. Returns id, name, shortUrl, closed status. Always call this first to discover board IDs before calling other board-scoped tools.",
+        "url": "https://api.trello.com/1/members/me/boards",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,url,shortUrl,closed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ed037183-7682-40c5-856f-22e75f94300e",
+      "name": "trello_get_all_boards",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -1280,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all members of a Trello board. Params: Board_ID (required, get from trello_get_all_boards). Returns id, fullName, username. Useful before assigning members to cards.",
+        "url": "=https://api.trello.com/1/boards/{{$fromAI(\"Board_ID\", \"\", \"string\")}}/members",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,fullName,username"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5458d07a-39c2-4ad3-af6e-9883b23170ea",
+      "name": "trello_get_board_members",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -1152,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all labels defined on a Trello board. Params: Board_ID (required). Returns id, name, color. Use to get label IDs before assigning labels to cards.",
+        "url": "=https://api.trello.com/1/boards/{{$fromAI(\"Board_ID\", \"\", \"string\")}}/labels",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,color"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bec0c3b7-3013-4853-875a-01d5b3c54c83",
+      "name": "trello_get_board_labels",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -1024,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all lists on a Trello board. Params: Board_ID (required, get from trello_get_all_boards). Returns id, name, closed status. Use to get list IDs before creating cards or fetching list cards.",
+        "url": "=https://api.trello.com/1/boards/{{$fromAI(\"Board_ID\", \"\", \"string\")}}/lists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "open"
+            },
+            {
+              "name": "fields",
+              "value": "id,name,closed,pos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7d8c40ad-62fe-4141-a252-db143adbdb14",
+      "name": "trello_get_lists_on_board",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -896,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all open cards in a specific Trello list. Params: List_ID (required, get from trello_get_lists_on_board). Returns id, name, desc, due, labels, url, idList.",
+        "url": "=https://api.trello.com/1/lists/{{$fromAI(\"List_ID\", \"\", \"string\")}}/cards",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,desc,due,labels,url,idList,idMembers"
+            },
+            {
+              "name": "filter",
+              "value": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d6165f47-2af5-4b71-b922-7d917c635310",
+      "name": "trello_get_list_cards",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -768,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Create a new list on a Trello board. Params: Board_ID (required), List_Name (required), Position (optional: \"top\", \"bottom\", or a positive number — defaults to \"bottom\").",
+        "method": "POST",
+        "url": "https://api.trello.com/1/lists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "idBoard",
+              "value": "={{$fromAI(\"Board_ID\", \"\", \"string\")}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$fromAI(\"List_Name\", \"\", \"string\")}}"
+            },
+            {
+              "name": "pos",
+              "value": "={{$fromAI(\"Position\", \"bottom\", \"string\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cf6f5ff7-174b-436f-9dc7-10de82a8839c",
+      "name": "trello_create_list",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -640,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Archive (close) a Trello list. Params: List_ID (required). This hides the list from the board but does not delete it. Irreversible via this tool — confirm with user before calling.",
+        "method": "PUT",
+        "url": "=https://api.trello.com/1/lists/{{$fromAI(\"List_ID\", \"\", \"string\")}}/closed",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "value",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1944bef8-282e-4410-98c9-a598ed011e22",
+      "name": "trello_archive_list",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -512,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all open cards on a Trello board. Params: Board_ID (required, get from trello_get_all_boards). Returns id, name, desc, idList, due, labels, url.",
+        "url": "=https://api.trello.com/1/boards/{{$fromAI(\"Board_ID\", \"\", \"string\")}}/cards",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,desc,idList,due,labels,url,idMembers"
+            },
+            {
+              "name": "filter",
+              "value": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "decf5e61-2e0c-4249-a681-40ccd044fd28",
+      "name": "trello_get_board_cards",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get full details of a single Trello card including description, due date, members, labels, comments, checklists, and attachments. Params: Card_ID (required).",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,desc,due,dueComplete,idList,idBoard,labels,idMembers,url,shortUrl"
+            },
+            {
+              "name": "actions",
+              "value": "commentCard"
+            },
+            {
+              "name": "checklists",
+              "value": "all"
+            },
+            {
+              "name": "attachments",
+              "value": "true"
+            },
+            {
+              "name": "members",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a9835d47-15a5-448d-bb1f-116cfa42b407",
+      "name": "trello_get_card_details",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -256,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search Trello cards by keyword. Params: Query (required, supports Trello search operators e.g. \"is:open due:week label:bug\"). Returns matching cards with id, name, desc, idList, url.",
+        "url": "https://api.trello.com/1/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{$fromAI(\"Query\", \"\", \"string\")}}"
+            },
+            {
+              "name": "modelTypes",
+              "value": "cards"
+            },
+            {
+              "name": "cards_fields",
+              "value": "id,name,desc,idList,due,labels,url,idBoard"
+            },
+            {
+              "name": "cards_limit",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ba030ee4-890b-48c3-abf6-b343dc6591ac",
+      "name": "trello_search_cards",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        -128,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Create a new card on a Trello list. Params: List_ID (required, get from trello_get_lists_on_board), Card_Name (required), Description (optional), Due_Date (optional ISO-8601), Member_IDs (optional, comma-separated member IDs), Label_IDs (optional, comma-separated label IDs).",
+        "method": "POST",
+        "url": "https://api.trello.com/1/cards",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "idList",
+              "value": "={{$fromAI(\"List_ID\", \"\", \"string\")}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$fromAI(\"Card_Name\", \"\", \"string\")}}"
+            },
+            {
+              "name": "desc",
+              "value": "={{$fromAI(\"Description\", \"\", \"string\")}}"
+            },
+            {
+              "name": "due",
+              "value": "={{$fromAI(\"Due_Date\", \"\", \"string\")}}"
+            },
+            {
+              "name": "idMembers",
+              "value": "={{$fromAI(\"Member_IDs\", \"\", \"string\")}}"
+            },
+            {
+              "name": "idLabels",
+              "value": "={{$fromAI(\"Label_IDs\", \"\", \"string\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e227a7aa-a464-4933-a82c-23945c27a15d",
+      "name": "trello_create_card",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Update fields on an existing Trello card. Params: Card_ID (required), New_Name (optional), New_Description (optional), New_Due (optional ISO-8601), New_List_ID (optional, to move card). Only provided fields are updated.",
+        "method": "PUT",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify(Object.assign({}, $fromAI(\"New_Name\",\"\",\"string\") ? { name: $fromAI(\"New_Name\",\"\",\"string\") } : {}, $fromAI(\"New_Description\",\"\",\"string\") ? { desc: $fromAI(\"New_Description\",\"\",\"string\") } : {}, $fromAI(\"New_Due\",\"\",\"string\") ? { due: $fromAI(\"New_Due\",\"\",\"string\") } : {}, $fromAI(\"New_List_ID\",\"\",\"string\") ? { idList: $fromAI(\"New_List_ID\",\"\",\"string\") } : {})) }}",
+        "options": {}
+      },
+      "id": "46355274-f743-45e5-bb46-2cb4e9d02466",
+      "name": "trello_update_card",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        128,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Archive (close) a Trello card. Params: Card_ID (required). The card is hidden from the board but not permanently deleted. Confirm with user before calling.",
+        "method": "PUT",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"closed\": true}",
+        "options": {}
+      },
+      "id": "d02ab267-84e8-4014-a73a-9066878feb40",
+      "name": "trello_archive_card",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        256,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Move a Trello card to a different list (and optionally a different board). Params: Card_ID (required), Target_List_ID (required, get from trello_get_lists_on_board), Target_Board_ID (optional, only needed when moving across boards).",
+        "method": "PUT",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify(Object.assign({ idList: $fromAI(\"Target_List_ID\",\"\",\"string\") }, $fromAI(\"Target_Board_ID\",\"\",\"string\") ? { idBoard: $fromAI(\"Target_Board_ID\",\"\",\"string\") } : {})) }}",
+        "options": {}
+      },
+      "id": "12703167-5878-4970-86be-29c3afca09f2",
+      "name": "trello_move_card",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Assign a member to a Trello card. Params: Card_ID (required), Member_ID (required, get from trello_get_board_members). Adds the member without removing existing assignees.",
+        "method": "POST",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}/idMembers",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "value",
+              "value": "={{$fromAI(\"Member_ID\", \"\", \"string\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47f7cddc-b509-4fa7-84b1-c6eadf672699",
+      "name": "trello_assign_member",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        512,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Assign a label to a Trello card. Params: Card_ID (required), Label_ID (required, get from trello_get_board_labels). Adds the label without removing existing labels.",
+        "method": "POST",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}/idLabels",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "value",
+              "value": "={{$fromAI(\"Label_ID\", \"\", \"string\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b761424a-7f00-4eb8-a2d0-dce907ee3c13",
+      "name": "trello_assign_label",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all comments on a Trello card. Params: Card_ID (required). Returns comment text, author, and date in reverse chronological order.",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}/actions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "commentCard"
+            },
+            {
+              "name": "fields",
+              "value": "data,date,memberCreator"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3fb844e6-2aa2-476d-8f36-1bdc56e81ec6",
+      "name": "trello_get_comments",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        768,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Add a comment to a Trello card. Params: Card_ID (required), Comment_Text (required).",
+        "method": "POST",
+        "url": "=https://api.trello.com/1/cards/{{$fromAI(\"Card_ID\", \"\", \"string\")}}/actions/comments",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$fromAI(\"Comment_Text\", \"\", \"string\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0814f8c7-4567-4b48-a464-9e6d4b3d4a99",
+      "name": "trello_add_comment",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        128
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "qtbic0OkJELjrVyT",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trello MCP v2\n\n**18 tools across 4 domains**\n\n**Boards:** get_all_boards, get_board_members, get_board_labels\n**Lists:** get_lists_on_board, get_list_cards, create_list, archive_list\n**Cards:** get_board_cards, get_card_details, search_cards, create_card, update_card, archive_card, move_card, assign_member, assign_label\n**Comments:** get_comments, add_comment\n\n⚠️ Assign your Trello API credential to all nodes after import.",
+        "color": 3
+      },
+      "id": "55d79737-827e-4cf1-8f8a-ee3906e44ec8",
+      "name": "Sticky Note 89b942b5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        4128
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "trello_get_all_boards": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_board_members": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_board_labels": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_lists_on_board": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_list_cards": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_create_list": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_archive_list": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_board_cards": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_card_details": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_search_cards": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_create_card": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_update_card": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_archive_card": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_move_card": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_assign_member": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_assign_label": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_get_comments": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trello_add_comment": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Trello",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": true
+  },
+  "versionId": "0b9d215d-2b5a-4673-af19-cad5f7967477",
+  "meta": {
+    "instanceId": "589cc82bfaef6a48e49f76563ee242289190c24e109e0fc3320975755d230378"
+  },
+  "nodeGroups": [],
+  "id": "qZxhII1q4omFcxtD",
+  "tags": []
+}
