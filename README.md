@@ -1,4 +1,4 @@
-![Demo](./chat.gif)
+![Demo](./chat2.gif)
 
 # Trello MCP — n8n
 
